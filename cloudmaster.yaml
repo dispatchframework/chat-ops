@@ -1,0 +1,29 @@
+kind: Function
+name: cloudmaster
+code: '@cloudmaster.py'
+image: python3
+schema: {}
+secrets:
+  - radio-all-access
+  - cloudmaster
+tags:
+  - key: role
+    value: radio
+---
+kind: Function
+name: clone-vm
+code: '@clonevm.py'
+image: python3-pyvmomi
+schema: {}
+tags:
+  - key: role
+    value: radio
+---
+kind: Function
+name: runs-vm-script
+code: '@powercli-run-vm-script.ps1'
+image: powershell-powercli
+schema: {}
+tags:
+  - key: role
+    value: radio

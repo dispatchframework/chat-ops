@@ -1,0 +1,34 @@
+kind: Function
+name: cloudmaster
+code: '@cloudmaster.py'
+image: python3
+schema: {}
+secrets:
+  - radio-demo
+  - slack
+tags:
+  - key: role
+    value: radio
+---
+kind: Function
+name: clone-vm
+code: '@clonevm.py'
+image: python3-pyvmomi
+schema: {}
+secrets:
+  - vcenter
+tags:
+  - key: role
+    value : radio
+---
+kind: Function
+name: status
+code: '@status.py'
+image: python3-pyvmomi
+schema: {}
+secrets:
+  - slack
+tags:
+  - key: role
+    value : radio
+

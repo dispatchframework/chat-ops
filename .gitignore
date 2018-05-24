@@ -1,0 +1,7 @@
+*.key
+*.pub
+.vscode
+radio*
+__pycache__
+*.json
+*install.yaml

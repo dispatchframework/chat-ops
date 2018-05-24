@@ -1,0 +1,17 @@
+{
+    "kind": "Policy",
+    "name": "all-access",
+    "rules": [
+        {
+            "actions": [
+                "*"
+            ],
+            "resources": [
+                "*"
+            ],
+            "subjects": [
+                "radio-demo"
+            ]
+        }
+    ]
+}

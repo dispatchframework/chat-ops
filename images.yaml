@@ -1,0 +1,17 @@
+kind: Image
+name: python3-pyvmomi
+baseImageName: python3-base
+runtimeDependencies:
+  manifest: '@pyvmomi.txt'
+tags:
+  - key: role
+    value: radio
+---
+kind: Image
+name: powershell-powercli
+baseImageName: powershell-base
+runtimeDependencies:
+  manifest: '@powercli.ps1'
+tags:
+  - key: role
+    value: radio
