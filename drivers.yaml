@@ -1,0 +1,8 @@
+kind: Driver
+name: vcenter
+type: vcenter
+secrets:
+  - vcenter
+tags:
+  - key: role
+    value : radio

@@ -4,8 +4,6 @@ import requests
 def handle(ctx, payload):
     secrets = ctx["secrets"]
 
-    payload = json.loads(payload)
-
     msg = payload.get("message")
     metadata = payload.setdefault("metadata", {})
     print(metadata)

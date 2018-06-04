@@ -50,6 +50,7 @@ def create(secrets, payload):
 
     if resp.status_code == 202:
         response = {
+            "response_type": "in_channel",
             "attachments": [
                 {
                     "title": "Create VM",

@@ -1,0 +1,44 @@
+kind: Subscription
+event-type: vm.powered.on
+function: status
+name: native-troll-352185
+source-type: vcenter
+tags:
+  - key: role
+    value : radio
+---
+kind: Subscription
+event-type: vm.removed
+function: status
+name: willing-cheetah-356512
+source-type: vcenter
+tags:
+  - key: role
+    value : radio
+---
+kind: Subscription
+event-type: vm.powered.off
+function: status
+name: touched-foal-822640
+source-type: vcenter
+tags:
+  - key: role
+    value : radio
+---
+kind: Subscription
+event-type: vm.stopping
+function: status
+name: just-wildcat-236741
+source-type: vcenter
+tags:
+  - key: role
+    value : radio
+---
+kind: Subscription
+event-type: vm.deployed
+function: status
+name: star-goose-402131
+source-type: vcenter
+tags:
+  - key: role
+    value : radio

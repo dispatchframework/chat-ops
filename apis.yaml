@@ -1,0 +1,14 @@
+kind: API
+name: post-cloudmaster
+authentication: public
+enabled: true
+function: cloudmaster
+methods:
+  - POST
+protocols:
+  - https
+uris:
+  - /cloudmaster
+tags:
+  - key: role
+    value : radio
