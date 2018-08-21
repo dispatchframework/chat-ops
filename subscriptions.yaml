@@ -1,44 +1,39 @@
 kind: Subscription
-event-type: vm.powered.on
+eventtype: vm.powered.on
 function: status
-name: native-troll-352185
-source-type: vcenter
+name: vm-powered-on-status
 tags:
   - key: role
-    value : radio
+    value : vmworld
 ---
 kind: Subscription
-event-type: vm.removed
+eventtype: vm.removed
 function: status
-name: willing-cheetah-356512
-source-type: vcenter
+name: vm-removed-status
 tags:
   - key: role
-    value : radio
+    value : vmworld
 ---
 kind: Subscription
-event-type: vm.powered.off
+eventtype: vm.powered.off
 function: status
-name: touched-foal-822640
-source-type: vcenter
+name: vm-powered-off-status
 tags:
   - key: role
-    value : radio
+    value : vmworld
 ---
 kind: Subscription
-event-type: vm.stopping
+eventtype: vm.stopping
 function: status
-name: just-wildcat-236741
-source-type: vcenter
+name: vm-stopping-status
 tags:
   - key: role
-    value : radio
+    value : vmworld
 ---
 kind: Subscription
-event-type: vm.deployed
+eventtype: vm.deployed
 function: status
-name: star-goose-402131
-source-type: vcenter
+name: vm-deployed-status
 tags:
   - key: role
-    value : radio
+    value : vmworld

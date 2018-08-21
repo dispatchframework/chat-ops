@@ -1,4 +1,4 @@
-# Radio Dispatch Demo
+# VMworld Dispatch Demo
 
 This guide walks through creation of a chat-ops integration with Slack using Dispatch.  Specifically we will be creating
 slack commands for interacting with VMware vCenter.
@@ -135,9 +135,9 @@ script.  It depends on the pyjwt library (this will be built into the Dispatch C
 generates a secret which includes the API gateway url:
 
 ```
-# The API GATEWAY_HOST will be unique for your installation
-export API_GATEWAY_HOST=api-dispatch.example.com
-python gen_jwt.py cloudmaster ./cloudmaster.key 30 $API_GATEWAY_HOST
+# The GATEWAY_HOST will be unique for your installation
+export GATEWAY_HOST=dispatch.example.com
+python gen_jwt.py cloudmaster ./cloudmaster.key 30 $GATEWAY_HOST
 Dispatch secret cloudmaster.json
 ```
 
@@ -222,7 +222,13 @@ dispatch create function clone-vm clonevm.py --image python3-pyvmomi --secret vc
 ## Create a vCenter Event Driver
 
 The vCenter event driver imports events from vCenter and pushes them onto the Dispatch event bus.  At this point,
-functions may be subscribed to the particular events.  We are going to use this to push status updates to Slack.
+functions may be subscribed to the particular events.  We are going to use this to push status updates to Slack.  First create the vcenter driver type:
+
+```
+dispatch create eventdrivertype vcenter dispatchframework/dispatch-events-vcenter
+```
+
+Then create the driver:
 
 ```
 dispatch create eventdriver vcenter --name vcenter --secret vcenter

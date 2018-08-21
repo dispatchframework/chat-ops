@@ -15,7 +15,7 @@ if __name__ == "__main__":
 
     encoded = jwt.encode(
         {
-            "iss": sa,
+            "iss": "dispatch/" + sa,
             "exp": int(time.time()+ttl*86400),
             "iat": int(time.time())
         },

@@ -5,3 +5,4 @@ radio*
 __pycache__
 *.json
 *install.yaml
+secrets.yaml
