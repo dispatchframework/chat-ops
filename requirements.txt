@@ -1,0 +1,5 @@
+azure==4.0.0
+boto3==1.9.25
+google-api-python-client==1.7.4
+requests==2.19.1
+pyvmomi
