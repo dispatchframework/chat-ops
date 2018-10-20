@@ -1,11 +1,11 @@
-# VMworld Dispatch Demo
+# Chat-ops Dispatch demo
 
 This guide walks through creation of a chat-ops integration with Slack using Dispatch.  Specifically we will be creating
-slack commands for interacting with VMware vCenter.
+slack commands for interacting with different clouds.
 
 ## Create Slack Incoming Webhook
 
-The incoming webhook will be used to asynchronously post vCenter status updates to a particular slack channel.  The
+The incoming webhook will be used to asynchronously post status updates to a particular slack channel.  The
 setup is pretty straightforward.
 
 [https://api.slack.com/incoming-webhooks](https://api.slack.com/incoming-webhooks)
