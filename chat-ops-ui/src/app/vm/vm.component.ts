@@ -1,13 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { OnInit } from '@angular/core';
 import { VMService } from "./vm.service";
 import { VM } from "./vm";
 
-
-@Component({
-  selector: 'app-aws',
-  templateUrl: './../vm/vm.component.html',
-  styleUrls: ['./../vm/vm.component.css']
-})
 export abstract class VMComponent implements OnInit {
 
   vmService !: VMService;

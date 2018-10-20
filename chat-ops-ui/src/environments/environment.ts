@@ -4,8 +4,7 @@
 
 export const environment = {
   production: false,
-  apiURL: "http://localhost:8081/dispatch-server/",
-  apiPathAWS: "aws"
+  apiURL: "https://ato-api.dispatchframework.io/"
 };
 
 /*

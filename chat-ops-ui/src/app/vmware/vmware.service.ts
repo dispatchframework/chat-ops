@@ -6,5 +6,5 @@ import { VMService } from '../vm/vm.service';
   providedIn: 'root'
 })
 export class VMwareService extends VMService {
-  cloud = "vmware";
+  cloud = "vsphere";
 }
