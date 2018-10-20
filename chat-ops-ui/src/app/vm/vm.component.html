@@ -1,0 +1,17 @@
+<clr-datagrid>
+    <clr-dg-column>Cloud</clr-dg-column>
+    <clr-dg-column>ID</clr-dg-column>
+    <clr-dg-column [clrDgField]="'name'">Name</clr-dg-column>
+    <clr-dg-column [clrDgField]="'state'">State</clr-dg-column>
+    <clr-dg-column>Actions</clr-dg-column>
+
+    <clr-dg-row *ngFor="let vm of vms">
+        <clr-dg-cell>{{vm.cloud}}</clr-dg-cell>
+        <clr-dg-cell>{{vm.id}}</clr-dg-cell>
+        <clr-dg-cell>{{vm.name}}</clr-dg-cell>
+        <clr-dg-cell>{{vm.state}}</clr-dg-cell>
+        <clr-dg-cell><a (click)="deleteVM(vm)"><clr-icon shape="trash" ></clr-icon></a></clr-dg-cell>
+    </clr-dg-row>
+
+    <clr-dg-footer>{{vms.length}} vms</clr-dg-footer>
+</clr-datagrid>

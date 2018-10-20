@@ -74,12 +74,20 @@ def handle(ctx, payload):
     entry point for GCP commands
     """
 
-    access_key = ctx['secrets']['aws']['access_key']
-    secret_key = ctx['secrets']['aws']['secret_key']
+    region = ctx['secrets']['region']
+    access_key = ctx['secrets']['aws_access_key']
+    secret_key = ctx['secrets']['aws_secret_key']
 
-    ec2_resource = boto3.resource("ec2", aws_access_key_id=access_key, aws_secret_access_key=secret_key)
-    ec2_client = boto3.client("ec2", aws_access_key_id=access_key,
-                              aws_secret_access_key=secret_key)
+    ec2_resource = boto3.resource(
+        "ec2",
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
+        region_name=region)
+    ec2_client = boto3.client(
+        "ec2",
+        aws_access_key_id=access_key,
+        aws_secret_access_key=secret_key,
+        region_name=region)
 
     if 'command' not in payload:
         return _error('command is required')
@@ -93,7 +101,7 @@ def handle(ctx, payload):
     if command == 'delete':
         result = delete_instance(ec2_resource, ec2_client, payload['name'])
 
-    return json.dumps(result)
+    return result
 
 
 def _error(error_msg):

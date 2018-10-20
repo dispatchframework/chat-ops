@@ -1,0 +1,25 @@
+<clr-main-container>
+  <clr-header>
+    <div class="branding">
+      <a href="#" class="nav-link">
+        <span class="clr-icon clr-clarity-logo"></span>
+        <span class="title">Cloudmaster</span>
+      </a>
+    </div>
+      <div class="header-nav" [clr-nav-level]="1">
+          <a class="nav-link" href="#" [routerLink]="['/aws']" routerLinkActive="active"><span class="nav-text">AWS</span></a>
+          <a class="nav-link" href="#" [routerLink]="['/gcp']" routerLinkActive="active"><span class="nav-text">GCP</span></a>
+          <a class="nav-link" href="#" [routerLink]="['/azure']" routerLinkActive="active"><span class="nav-text">Azure</span></a>
+          <a class="nav-link" href="#" [routerLink]="['/vmware']" routerLinkActive="active"><span class="nav-text">VMware</span></a>
+          <a class="nav-link" href="http://dispatchframework.io"><span class="nav-text">About</span></a>
+      </div>
+    <div class="header-actions">
+    </div>
+  </clr-header>
+  <div class="content-container">
+    <div class="content-area">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</clr-main-container>
+
