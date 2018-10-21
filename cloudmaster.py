@@ -2,6 +2,8 @@ import json
 import re
 import requests
 
+CLOUDS = ['aws', 'azure', 'gcp', 'vsphere']
+
 
 def i_dont_understand(payload):
     """Prints help message when user provides unsupported command"""
@@ -11,9 +13,9 @@ def i_dont_understand(payload):
             {
                 "title": "I don't understand",
                 "text": "I didn't understand your command... try:\n"
-                        "• create <vm name> on <aws|gcp|azure|all>\n"
-                        "• list <aws|gcp|azure|all>\n",
-                        "• delete <vm name> on <aws|gcp|azure|all>\n"
+                        "• create <vm name> on <" + '|'.join(CLOUDS) + "|all>\n"
+                        "• list <" + '|'.join(CLOUDS) + "|all>\n"
+                        "• delete <vm name> on <" + '|'.join(CLOUDS) + "|all>\n",
                 "mrkdwn_in": [
                     "text"
                 ],
@@ -29,7 +31,7 @@ def send_command(token, url, command, cloud, name=''):
     """Sends a command to cloud handlers. supported commands: create, list, delete"""
 
     payload = {
-        "blocking": False,
+        "blocking": True,
         "input": {
             "name": name,
             "command": command
@@ -40,7 +42,7 @@ def send_command(token, url, command, cloud, name=''):
     print(payload)
 
     return requests.post("%s/v1/runs?functionName=%s" % (url, cloud),
-                         headers={"Authorization": "Bearer %s" % token},
+                         headers={"Authorization": "Bearer %s" % token, "X-Dispatch-Org": "dispatch"},
                          json=payload)
 
 
@@ -49,7 +51,7 @@ def create_vm(secrets, response_url, name, cloud):
 
     resp = send_command(secrets['jwt'], secrets['url'], 'create', cloud, name)
 
-    if resp.status_code == 202:
+    if resp.status_code == 200:
         response = {
             "response_type": "in_channel",
             "attachments": [
@@ -85,7 +87,7 @@ def delete_vm(secrets, response_url, name, cloud):
 
     resp = send_command(secrets['jwt'], secrets['url'], 'delete', cloud, name)
 
-    if resp.status_code == 202:
+    if resp.status_code == 200:
         response = {
             "response_type": "in_channel",
             "attachments": [
@@ -120,7 +122,7 @@ def list_vm(secrets, response_url, cloud):
     """List vms on a selected cloud and handles the response"""
 
     resp = send_command(secrets['jwt'], secrets['url'], 'list', cloud)
-    vms = resp.json()
+    vms = resp.json()['output']
 
     if len(vms) == 0:
         response = {
@@ -137,14 +139,15 @@ def list_vm(secrets, response_url, cloud):
             ]
         }
     else:
-        text = ""
+        text = "```NAME\tSTATUS\n"
         for vm in vms:
-            text += "* ID: {}, NAME: {}, STATE: {}".format(vm['id'], vm['name'], vm['state'])
+            text += "{}\t{}\n".format(vm['name'], vm['status'])
+        text += "```"
         response = {
             "response_type": "in_channel",
             "attachments": [
                 {
-                    "title": "Instances in cloud {}".format(cloud),
+                    "title": "Instances in cloud {}".format(cloud.upper()),
                     "text": text,
                     "mrkdwn_in": [
                         "text"
@@ -169,11 +172,11 @@ def create(secrets, payload):
     params = m.groupdict()
     name = params['name']
     cloud = params['cloud']
-    if cloud not in ['aws', 'gcp', 'azure', 'all']:
+    if cloud not in ['all'] + CLOUDS:
         return i_dont_understand(payload)
 
     if cloud == 'all':
-        for c in ['aws', 'gcp', 'azure']:
+        for c in CLOUDS:
             create_vm(secrets, payload['response_url'], name, c)
     else:
         create_vm(secrets, payload['response_url'], name, cloud)
@@ -185,16 +188,16 @@ def list_instances(secrets, payload):
     r = re.compile(r"^(?P<command>list)\s(?P<cloud>.+)\s*$")
     m = r.match(payload["text"])
     if not m:
-        return i_dont_understand(secrets, payload)
+        return i_dont_understand(payload)
 
     params = m.groupdict()
     cloud = params['cloud']
 
-    if cloud not in ['aws', 'gcp', 'azure', 'all']:
+    if cloud not in ['all'] + CLOUDS:
         return i_dont_understand(payload)
 
     if cloud == 'all':
-        for c in ['aws', 'gcp', 'azure']:
+        for c in CLOUDS:
             list_vm(secrets, payload['response_url'], c)
     else:
         list_vm(secrets, payload['response_url'], cloud)
@@ -211,11 +214,11 @@ def delete(secrets, payload):
     params = m.groupdict()
     name = params['name']
     cloud = params['cloud']
-    if cloud not in ['aws', 'gcp', 'azure', 'all']:
+    if cloud not in ['all'] + CLOUDS:
         return i_dont_understand(payload)
 
     if cloud == 'all':
-        for c in ['aws', 'gcp', 'azure']:
+        for c in CLOUDS:
             delete_vm(secrets, payload['response_url'], name, c)
     else:
         delete_vm(secrets, payload['response_url'], name, cloud)
@@ -233,7 +236,7 @@ def echo(secrets, payload):
 
     resp = requests.post(
         "%s/v1/runs?functionName=%s" % (secrets["url"], "echo"),
-        headers={"Authorization": "Bearer %s" % secrets["jwt"]},
+        headers={"Authorization": "Bearer %s" % secrets["jwt"], "X-Dispatch-Org": "dispatch"},
         json=echo)
 
     if resp.ok and resp.json()["status"] == "READY":
@@ -279,7 +282,7 @@ def handle(ctx, payload):
 
     command = commands.get(command_name)
     if command is None:
-        i_dont_understand(ctx["secrets"], payload)
+        i_dont_understand(payload)
     else:
         command(ctx["secrets"], payload)
     return {"text": "ok"}
