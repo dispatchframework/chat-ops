@@ -4,6 +4,47 @@
 # SPDX-License-Identifier: Apache-2.0
 #######################################################################
 
+"""
+Example function to manage (create, delete, list) VMs on AWS.
+
+** REQUIREMENTS **
+
+* secret
+
+
+Save all required AWS secrets in a JSON file.
+
+cat << EOF > aws.json
+{
+  "access_key": "<access_key>",
+  "secret_key": "<secret_key>",
+  "region": "us-west-2"
+}
+EOF
+
+Create a secret:
+
+dispatch create secret aws aws.json
+
+* image
+
+Create requirements file:
+
+cat << EOF > requirements.txt
+boto3==1.9.25
+EOF
+
+dispatch create base-image python3-base dispatchframework/python3-base:0.0.13 --language python3
+dispatch create image python-aws python3-base --runtime-deps requirements.txt
+
+Create a function:
+dispatch create function python-aws aws aws.py --secret aws
+
+Execute it:
+dispatch exec aws --wait --input='{"command": "create","name": "exampleVM"}'
+
+"""
+
 import json
 
 import boto3
@@ -21,7 +62,7 @@ def list_instances(ec2):
     return [{
             "id": i.id,
             "name": [t["Value"] for t in i.tags if t["Key"] == "Name"][0],
-            "state": i.state["Name"],
+            "status": i.state["Name"],
             } for i in result if i.state["Name"] != "terminated"]
 
 
@@ -71,23 +112,17 @@ def delete_instance(ec2_resource, ec2_client, name):
 
 def handle(ctx, payload):
     """
-    entry point for GCP commands
+    entry point for AWS commands
     """
 
+    access_key = ctx['secrets']['access_key']
+    secret_key = ctx['secrets']['secret_key']
     region = ctx['secrets']['region']
-    access_key = ctx['secrets']['aws_access_key']
-    secret_key = ctx['secrets']['aws_secret_key']
 
-    ec2_resource = boto3.resource(
-        "ec2",
-        aws_access_key_id=access_key,
-        aws_secret_access_key=secret_key,
-        region_name=region)
-    ec2_client = boto3.client(
-        "ec2",
-        aws_access_key_id=access_key,
-        aws_secret_access_key=secret_key,
-        region_name=region)
+    ec2_resource = boto3.resource("ec2", aws_access_key_id=access_key,
+                                  aws_secret_access_key=secret_key, region_name=region)
+    ec2_client = boto3.client("ec2", aws_access_key_id=access_key,
+                              aws_secret_access_key=secret_key, region_name=region)
 
     if 'command' not in payload:
         return _error('command is required')

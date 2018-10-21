@@ -16,20 +16,18 @@ in Azure by using Azure CLI:
 
 az ad sp create-for-rbac --name principalName --password "" # empty password will generate a random one
 
-Store all the required secrets in a JSON file.
+Save all required secrets in a JSON file.
 
 cat << EOF > azure.json
-{
 {
     "clientId": "<UUID>",
     "password": "<UUID>",
     "tenant": "<UUID>",
     "subscription": "<UUID>",
     "admin_password": "<Password for admin account within a VM>",
-    "location": "<Azure region, e.g. useast2>",
+    "location": "<Azure region, e.g. eastus2>",
     "subnet": "<name of the subnet to connect VM to>",
     "virtual_network": "<name of the virtual network where the subnet resides>"
-  }
 }
 EOF
 
@@ -45,7 +43,7 @@ cat << EOF > requirements.txt
 azure==4.0.0
 EOF
 
-dispatch create base-image python3-base dispatchframework/python3-base:0.0.3 --language python3
+dispatch create base-image python3-base dispatchframework/python3-base:0.0.13 --language python3
 dispatch create image python-azure python3-base --runtime-deps requirements.txt
 
 Create a function:
@@ -83,7 +81,7 @@ def list_instances(compute_client):
     return [{
             "id": vm.id,
             "name": vm.name,
-            "state": vm.provisioning_state,
+            "status": vm.provisioning_state,
             "tags": vm.tags
             } for vm in compute_client.virtual_machines.list_all()
             if vm.tags and 'managedby' in vm.tags and vm.tags['managedby'] == 'cloudmaster']
@@ -175,9 +173,11 @@ def _error(error_msg):
 def handle(ctx, payload):
     """entrypoint for Azure operations """
     resource_group = ctx['secrets']['resource_group']
-    location = ctx['secrets']['subscription']
+    location = ctx['secrets']['location']
     subscription = ctx['secrets']['subscription']
     admin_password = ctx['secrets']['admin_password']
+    subnet = ctx['secrets']['subnet']
+    virtual_network = ctx['secrets']['virtual_network']
 
     credentials = get_credentials(client_id=ctx['secrets']['clientId'],
                                   secret=ctx['secrets']['password'],
@@ -194,13 +194,6 @@ def handle(ctx, payload):
     result = {"error": "command {} is not supported".format(command)}
 
     if command == 'create':
-        if 'subnet' not in payload:
-            return _error('subnet is required')
-        subnet = payload['subnet']
-
-        if 'virtual_network' not in payload:
-            return _error('virtual network is required')
-        virtual_network = payload['virtual_network']
 
         if 'name' not in payload:
             return _error('vm name is required')
@@ -216,7 +209,7 @@ def handle(ctx, payload):
         result = delete_instance(compute_client, resource_group, payload['name'])
         delete_nic(network_client, resource_group, payload['name'])
 
-    return json.dumps(result)
+    return result
 
 
 if __name__ == "__main__":
