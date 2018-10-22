@@ -1,0 +1,54 @@
+kind: Function
+name: cloudmaster
+sourcePath: 'cloudmaster.py'
+image: python3
+secrets:
+  - cloudmaster
+---
+kind: Function
+name: gcp
+sourcePath: 'gcp.py'
+image: python3-cloud
+secrets:
+  - gcp
+---
+kind: Function
+name: aws
+sourcePath: 'aws.py'
+image: python3-cloud
+secrets:
+- aws
+---
+kind: Function
+name: azure
+sourcePath: 'azurecloud.py'
+image: python3-cloud
+secrets:
+- azure
+---
+kind: Function
+name: vsphere
+sourcePath: 'vsphere.py'
+image: python3-cloud
+secrets:
+- vsphere
+---
+kind: Function
+name: status
+sourcePath: 'status.py'
+image: python3-cloud
+secrets:
+  - vsphere
+---
+kind: Function
+name: echo
+sourcePath: 'echo.js'
+image: nodejs
+---
+kind: Function
+name: harden-vm
+sourcePath: 'hardenvm.ps1'
+image: powershell-powercli
+secrets:
+  - vsphere
+

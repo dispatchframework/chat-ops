@@ -1,0 +1,10 @@
+---
+kind: Subscription
+eventtype: vm.deployed
+function: harden-vm
+name: deployed_harden
+---
+kind: Subscription
+eventtype: vm.being.deployed
+function: status
+name: deployed_status
