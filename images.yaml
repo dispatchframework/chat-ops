@@ -5,4 +5,13 @@ runtimeDependencies:
   manifest: '@pyvmomi.txt'
 tags:
   - key: role
-    value: radio
+    value: all-things-open
+---
+kind: Image
+name: python3-boto
+baseImageName: python3-base
+runtimeDependencies:
+  manifest: '@boto.txt'
+tags:
+  - key: role
+    value: all-things-open
