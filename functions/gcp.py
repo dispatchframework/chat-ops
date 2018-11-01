@@ -4,6 +4,49 @@
 # SPDX-License-Identifier: Apache-2.0
 #######################################################################
 
+"""
+Example function to manage (create, delete, list) VMs on GCP.
+
+** REQUIREMENTS **
+
+* secret
+
+Save all required GCP secrets in a JSON file. the file should contain the service account secrets downloaded as JSON file,
+plus additional entry for a zone.
+
+cat << EOF > gcp.json
+{
+  "type": "service_account",
+  "project_id": "<project_id>",
+  ... Other service account credentials
+  "zone": "us-west1-c"
+}
+
+EOF
+
+Create a secret:
+
+dispatch create secret gcp gcp.json
+
+* image
+
+Create requirements file:
+
+cat << EOF > requirements.txt
+google-api-python-client==1.7.4
+EOF
+
+dispatch create base-image python3-base dispatchframework/python3-base:0.0.13 --language python3
+dispatch create image python-gcp python3-base --runtime-deps requirements.txt
+
+Create a function:
+dispatch create function python-gcp gcp gcp.py --secret gcp
+
+Execute it:
+dispatch exec gcp --wait --input='{"command": "create","name": "exampleVM"}'
+
+"""
+
 import time
 import json
 
@@ -105,7 +148,7 @@ def handle(ctx, payload):
     if command == 'delete':
         result = delete_instance(compute, project, zone, payload['name'])
 
-    return json.dumps(result)
+    return result
 
 
 def _error(error_msg):

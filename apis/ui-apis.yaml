@@ -1,0 +1,58 @@
+kind: API
+name: get-aws
+enabled: true
+function: aws
+cors: true
+methods:
+  - GET
+protocols:
+  - https
+hosts:
+  - dispatch.example.com
+uris:
+  - /gcp
+
+---
+kind: API
+name: get-gcp
+enabled: true
+function: gcp
+cors: true
+methods:
+  - GET
+protocols:
+  - https
+hosts:
+  - dispatch.example.com
+uris:
+  - /gcp
+
+---
+kind: API
+name: get-azure
+enabled: true
+function: azure
+cors: true
+methods:
+  - GET
+protocols:
+  - https
+hosts:
+  - dispatch.example.com
+uris:
+  - /azure
+
+---
+kind: API
+name: get-vsphere
+enabled: true
+function: vsphere
+cors: true
+methods:
+  - GET
+protocols:
+  - https
+hosts:
+  - dispatch.example.com
+uris:
+  - /vsphere

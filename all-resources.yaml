@@ -1,0 +1,178 @@
+# Before running this file, create required secrets. See README.md for details
+
+## Images
+
+---
+kind: Image
+name: python3-cloud
+baseimagename: python3-base
+language: python3
+runtimedependencies:
+  manifest: '@images/requirements.txt'
+---
+kind: Image
+name: powershell-powercli
+baseimagename: powershell-base
+language: powershell
+runtimedependencies:
+  manifest: '@images/requirements.psd1'
+
+
+## functions
+---
+kind: Function
+name: cloudmaster
+sourcePath: 'functions/cloudmaster.py'
+image: python3
+secrets:
+- cloudmaster
+---
+kind: Function
+name: gcp
+sourcePath: 'functions/gcp.py'
+image: python3-cloud
+secrets:
+- gcp
+---
+kind: Function
+name: aws
+sourcePath: 'functions/aws.py'
+image: python3-cloud
+secrets:
+- aws
+---
+kind: Function
+name: azure
+sourcePath: 'functions/azurecloud.py'
+image: python3-cloud
+secrets:
+- azure
+---
+kind: Function
+name: vsphere
+sourcePath: 'functions/vsphere.py'
+image: python3-cloud
+secrets:
+- vsphere
+---
+kind: Function
+name: status
+sourcePath: 'functions/status.py'
+image: python3-cloud
+secrets:
+- vsphere
+---
+kind: Function
+name: echo
+sourcePath: 'functions/echo.js'
+image: nodejs
+---
+kind: Function
+name: harden-vm
+sourcePath: 'functions/hardenvm.ps1'
+image: powershell-powercli
+secrets:
+- vsphere
+
+## APIs
+
+---
+kind: API
+name: cloudmaster
+authentication: public
+enabled: true
+function: cloudmaster
+methods:
+- POST
+protocols:
+- https
+uris:
+- /cloudmaster
+
+---
+kind: API
+name: get-aws
+enabled: true
+function: aws
+cors: true
+methods:
+- GET
+protocols:
+- https
+hosts:
+- ato-api.dispatchframework.io
+uris:
+- /gcp
+
+---
+kind: API
+name: get-gcp
+enabled: true
+function: gcp
+cors: true
+methods:
+- GET
+protocols:
+- https
+hosts:
+- ato-api.dispatchframework.io
+uris:
+- /gcp
+
+---
+kind: API
+name: get-azure
+enabled: true
+function: azure
+cors: true
+methods:
+- GET
+protocols:
+- https
+hosts:
+- ato-api.dispatchframework.io
+uris:
+- /azure
+
+---
+kind: API
+name: get-vsphere
+enabled: true
+function: vsphere
+cors: true
+methods:
+- GET
+protocols:
+- https
+hosts:
+- ato-api.dispatchframework.io
+uris:
+- /vsphere
+
+
+## event drivers
+
+---
+kind: DriverType
+image: dispatchframework/dispatch-events-vcenter:solo
+expose: false
+name: vcenter
+---
+kind: Driver
+name: vcenter
+type: vcenter
+secrets:
+- vsphere
+
+## subscriptions
+
+---
+kind: Subscription
+eventtype: vm.deployed
+function: harden-vm
+name: deployed_harden
+---
+kind: Subscription
+eventtype: vm.being.deployed
+function: status
+name: deployed_status

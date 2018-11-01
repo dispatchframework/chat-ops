@@ -1,0 +1,19 @@
+---
+kind: Image
+name: python3-cloud
+baseimagename: python3-base
+language: python3
+runtimedependencies:
+  manifest: '@requirements.txt'
+---
+kind: Image
+name: nodejs
+baseimagename: nodejs
+language: nodejs
+---
+kind: Image
+name: powershell-powercli
+baseimagename: powershell-base
+language: powershell
+runtimedependencies:
+  manifest: '@requirements.psd1'

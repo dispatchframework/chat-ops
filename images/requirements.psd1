@@ -1,0 +1,3 @@
+@{
+  'VMware.PowerCLI' = 'latest'
+}

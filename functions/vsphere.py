@@ -5,54 +5,45 @@
 #######################################################################
 
 """
-Example function to manage (create, delete, list) VMs in Azure.
+Example function to manage (create, delete, list) VMs in vSphere.
 
 ** REQUIREMENTS **
 
 * secret
 
-you can  obtain clientId, password and tenant when creating a service principal. you can create service principal
-in Azure by using Azure CLI:
-
-az ad sp create-for-rbac --name principalName --password "" # empty password will generate a random one
-
 Store all the required secrets in a JSON file.
 
-cat << EOF > azure.json
+cat << EOF > vsphere.json
 {
-{
-    "clientId": "<UUID>",
-    "password": "<UUID>",
-    "tenant": "<UUID>",
-    "subscription": "<UUID>",
-    "admin_password": "<Password for admin account within a VM>",
-    "location": "<Azure region, e.g. useast2>",
-    "subnet": "<name of the subnet to connect VM to>",
-    "virtual_network": "<name of the virtual network where the subnet resides>"
-  }
+  "host": "vCenter URL",
+  "datacenter": "SDDC-Datacenter",
+  "resourcePool": "Compute-ResourcePool",
+  "vmFolder": "Workloads",
+  "username": "<username>",
+  "password": "<password>"
 }
 EOF
 
 Create a secret:
 
-dispatch create secret azure azure.json
+dispatch create secret vsphere vsphere.json
 
 * image
 
 Create requirements file:
 
 cat << EOF > requirements.txt
-azure==4.0.0
+pyvmomi==6.7.0.2018.9
 EOF
 
 dispatch create base-image python3-base dispatchframework/python3-base:0.0.3 --language python3
-dispatch create image python-azure python3-base --runtime-deps requirements.txt
+dispatch create image python-vsphere python3-base --runtime-deps requirements.txt
 
 Create a function:
-dispatch create function python-azure azure azurecloud.py --secret azure
+dispatch create function python-vsphere vsphere vsphere.py --secret vsphere
 
 Execute it:
-dispatch exec azure --wait --input='{"command": "create","name": "exampleVM"}'
+dispatch exec vsphere --wait --input='{"command": "create","name": "exampleVM"}'
 
 """
 
@@ -88,6 +79,7 @@ def list_vms(vm_folder):
         {
             'name': vm.summary.config.name,
             'id': vm.summary.config.instanceUuid,
+            'status': vm.runtime.powerState,
         }
         for vm in vm_folder.childEntity]
 
@@ -158,7 +150,6 @@ def handle(ctx, payload):
     vm_name = payload.get("name")
     power_on = payload.get("powerOn", False)
 
-
     if 'command' not in payload:
         return _error('command is required')
     command = payload['command']
@@ -194,7 +185,7 @@ def handle(ctx, payload):
 
     Disconnect(si)
 
-    return json.dumps(result)
+    return result
 
 
 if __name__ == "__main__":

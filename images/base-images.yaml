@@ -1,0 +1,15 @@
+---
+kind: BaseImage
+dockerurl: dispatchframework/nodejs-base:0.0.11
+language: nodejs
+name: nodejs
+---
+kind: BaseImage
+name: powershell-base
+dockerurl: dispatchframework/powershell-base:0.0.13
+language: powershell
+---
+kind: BaseImage
+name: python3
+dockerurl: dispatchframework/python3-base:0.0.13
+language: python3

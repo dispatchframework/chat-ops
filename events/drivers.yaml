@@ -1,0 +1,10 @@
+kind: DriverType
+image: dispatchframework/dispatch-events-vcenter:solo
+expose: false
+name: vcenter
+---
+kind: Driver
+name: vcenter
+type: vcenter
+secrets:
+  - vsphere

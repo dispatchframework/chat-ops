@@ -1,5 +1,5 @@
 kind: API
-name: post-cloudmaster
+name: cloudmaster
 authentication: public
 enabled: true
 function: cloudmaster
@@ -9,6 +9,3 @@ protocols:
   - https
 uris:
   - /cloudmaster
-tags:
-  - key: role
-    value : radio
