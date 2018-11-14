@@ -3,6 +3,19 @@
 This guide walks through creation of a chat-ops integration with Slack using Dispatch.  Specifically we will be creating
 slack commands for interacting with different clouds.
 
+## Running in Fusion/Workstation
+
+If running this demo locally, you will need to create a tunnel so that slack can reach back to your VM and call Dispatch.  [ngrok](https://ngrok.com/) is a great tool for setting up quick tunnels for demos and development.  Using ngrok, simply create a tunnel to the Dispatch API gateway with the following command:
+
+```bash
+ngrok http <VM IP>:8081
+```
+
+Use the https forwarding address when creating the cloudmaster slash command below.
+
+![ngrok](ngrok.png)
+
+
 ## Create Slack Incoming Webhook
 
 The incoming webhook will be used to asynchronously post status updates to a particular slack channel.  The
@@ -10,21 +23,7 @@ setup is pretty straightforward.
 
 [https://api.slack.com/incoming-webhooks](https://api.slack.com/incoming-webhooks)
 
-Select a channel to post messages to.  Then record the webhook URL.  We will use this shortly.
-
-## Create Slack Slash Command
-
-Next we use a slack slash comand to issue "cloudmaster" commands.  Setup again should be pretty straightforward.
-
-[https://api.slack.com/slash-commands](https://api.slack.com/slash-commands)
-
-This demo assumes that the command is `/cloudmaster`.  The URL is the Dispatch API gateway hostname or IP address plus
-the path of the API endpoint we will create later.  For internal integrations, certificates are not required (See
-[Appendix](#appendix-using-lets-encrypt-with-dispatch) to find out how to use Let's Encrypt with Dispatch).
-It should look something like `https://api-dispatch.example.com/cloudmaster`.  Also for method, choose `POST`.  The
-rest of the configuration is mostly informational.  Configure as you like.
-
-Store the URL from the incoming web hook in `slack.json`:
+Select a channel to post messages to, then store the URL from the incoming web hook in `slack.json`:
 
 ```json
 {
@@ -38,20 +37,50 @@ Now, let's go ahead and store the secret in Dispatch:
 dispatch create secret slack slack.json
 ```
 
-## Creating secrets
-Our demo will use credentials for different clouds. Dispatch uses secrets to store them separately from your code, and injects them
-when the function is executed. We need to create following secrets for this demo (if you are not using all the clouds, skip the respective secrets):
+## Create Slack Slash Command
 
-#### Cloudmaster
-This is a secret that will be used to inject URL of Dispatch server to our functions, so that they can call subsequent functions as well.
-Create a JSON file `cloudmaster.json` with following contents:
+Next we use a slack slash comand to issue "cloudmaster" commands.  Setup again should be pretty straightforward.
+
+[https://api.slack.com/slash-commands](https://api.slack.com/slash-commands)
+
+This demo assumes that the command is `/cloudmaster`.  The URL is the Dispatch API gateway hostname or IP address plus
+the path of the API endpoint we will create later.  For internal integrations, certificates are not required (See
+[Appendix](#appendix-using-lets-encrypt-with-dispatch) to find out how to use Let's Encrypt with Dispatch).
+
+If you are using ngrok, the url will look similar to:
+```
+https://6083208d.ngrok.io/dispatch-server/cloudmaster
+```
+
+Otherwise:
+```
+https://<API GATEWAY HOSTNAME>/dispatch-server/cloudmaster
+```
+Also for method, choose `POST`.  The rest of the configuration is mostly informational.  Configure as you like.
+
+## Configuring Cloudmaster
+
+The cloudmaster function that we create later will need the a URL to connect back to the Dispatch API server.  Because
+the function is running in a docker container simply using `http://localhost:8080` does not work.  Instead use the
+internal IP address used by the host.  For Linux/OVA deployments:
+
 ```json
 {
-  "url": "http://dispatch.example.com:8080"
+  "url": "http://172.17.0.1:8080"
 }
 ```
-Replace `dispatch.example.com:8080` with host and port of your dispatch-server installation. it should be resolvable inside the container
-running the function. 
+
+If running natively on mac:
+
+```json
+{
+  "url": "http://host.docker.internal:8080"
+}
+```
+
+## Creating Cloud Secrets
+Our demo will use credentials for different clouds. Dispatch uses secrets to store them separately from your code, and injects them
+when the function is executed. We need to create following secrets for this demo (if you are not using all the clouds, skip the respective secrets):
 
 #### AWS
 Create a JSON file `aws.json` with following contents:
@@ -81,7 +110,7 @@ Create a JSON file `azure.json` with following contents:
     "virtual_network": "<name of the virtual network where the subnet resides>"
 }
 ```
-adjust the values to your environment. Then run: 
+adjust the values to your environment. Then run:
 ```bash
 dispatch create secret azure azure.json
 ```
@@ -94,7 +123,7 @@ Create a JSON file `gcp.json` with following contents:
   ... Other service account credentials, as included in the JSON file downloaded from GCP IAM.
   "zone": "us-west1-c"
 ```
-adjust the values to your environment. Then run: 
+adjust the values to your environment. Then run:
 ```bash
 dispatch create secret gcp gcp.json
 ```
@@ -111,12 +140,12 @@ Create a JSON file `vsphere.json` with following contents:
   "password": "<password>"
 }
 ```
-adjust the values to your environment. Then run: 
+adjust the values to your environment. Then run:
 ```bash
 dispatch create secret vsphere vsphere.json
 ```
 
-## Creating seed images
+## Creating Seed Images
 Dispatch comes with few images that are pre-configured for most common use cases. Base Images bring support for different
 programming languages, where as Images build upon them, adding system and runtime dependencies. Run
 ```bash
@@ -126,7 +155,7 @@ dispatch create seed-images
 to create images for python, java, nodejs and powershell. We will utilize those images below.
 
 
-## Creating resources
+## Creating Resources
 This demo is using multiple resources. You can create them individually (for example, if you are not using one of the clouds).
 If you want to create all of them, run `dispatch create -f all-resources.yaml`. This will create all base images, images,
 functions, API definitions, event drivers and subscriptions used in the demo.

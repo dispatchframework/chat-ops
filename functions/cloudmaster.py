@@ -27,7 +27,7 @@ def i_dont_understand(payload):
     print("response[%s]: %s" % (resp.status_code, resp.text))
 
 
-def send_command(token, url, command, cloud, name=''):
+def send_command(url, command, cloud, name=''):
     """Sends a command to cloud handlers. supported commands: create, list, delete"""
 
     payload = {
@@ -42,14 +42,14 @@ def send_command(token, url, command, cloud, name=''):
     print(payload)
 
     return requests.post("%s/v1/runs?functionName=%s" % (url, cloud),
-                         headers={"Authorization": "Bearer %s" % token, "X-Dispatch-Org": "dispatch"},
+                         headers={"Cookie": "cookie", "X-Dispatch-Org": "dispatch-server"},
                          json=payload)
 
 
 def create_vm(secrets, response_url, name, cloud):
     """Creates a vm on a selected cloud and handles the response"""
 
-    resp = send_command(secrets['jwt'], secrets['url'], 'create', cloud, name)
+    resp = send_command(secrets['url'], 'create', cloud, name)
 
     if resp.status_code == 200:
         response = {
@@ -85,7 +85,7 @@ def create_vm(secrets, response_url, name, cloud):
 def delete_vm(secrets, response_url, name, cloud):
     """Deletes a vm on a selected cloud and handles the response"""
 
-    resp = send_command(secrets['jwt'], secrets['url'], 'delete', cloud, name)
+    resp = send_command(secrets['url'], 'delete', cloud, name)
 
     if resp.status_code == 200:
         response = {
@@ -121,7 +121,7 @@ def delete_vm(secrets, response_url, name, cloud):
 def list_vm(secrets, response_url, cloud):
     """List vms on a selected cloud and handles the response"""
 
-    resp = send_command(secrets['jwt'], secrets['url'], 'list', cloud)
+    resp = send_command(secrets['url'], 'list', cloud)
     vms = resp.json()['output']
 
     if len(vms) == 0:
@@ -236,7 +236,7 @@ def echo(secrets, payload):
 
     resp = requests.post(
         "%s/v1/runs?functionName=%s" % (secrets["url"], "echo"),
-        headers={"Authorization": "Bearer %s" % secrets["jwt"], "X-Dispatch-Org": "dispatch"},
+        headers={"Cookie": "cookie", "X-Dispatch-Org": "dispatch-server"},
         json=echo)
 
     if resp.ok and resp.json()["status"] == "READY":

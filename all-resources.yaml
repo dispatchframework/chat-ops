@@ -26,6 +26,7 @@ sourcePath: 'functions/cloudmaster.py'
 image: python3
 secrets:
 - cloudmaster
+- slack
 ---
 kind: Function
 name: gcp
@@ -73,6 +74,14 @@ sourcePath: 'functions/hardenvm.ps1'
 image: powershell-powercli
 secrets:
 - vsphere
+- slack
+---
+kind: Function
+name: status
+sourcePath: 'functions/status.py'
+image: python3
+secrets:
+- slack
 
 ## APIs
 
@@ -85,6 +94,7 @@ function: cloudmaster
 methods:
 - POST
 protocols:
+- http
 - https
 uris:
 - /cloudmaster
@@ -98,9 +108,8 @@ cors: true
 methods:
 - GET
 protocols:
+- http
 - https
-hosts:
-- ato-api.dispatchframework.io
 uris:
 - /gcp
 
@@ -113,9 +122,8 @@ cors: true
 methods:
 - GET
 protocols:
+- http
 - https
-hosts:
-- ato-api.dispatchframework.io
 uris:
 - /gcp
 
@@ -128,9 +136,8 @@ cors: true
 methods:
 - GET
 protocols:
+- http
 - https
-hosts:
-- ato-api.dispatchframework.io
 uris:
 - /azure
 
@@ -143,9 +150,8 @@ cors: true
 methods:
 - GET
 protocols:
+- http
 - https
-hosts:
-- ato-api.dispatchframework.io
 uris:
 - /vsphere
 
@@ -154,7 +160,7 @@ uris:
 
 ---
 kind: DriverType
-image: dispatchframework/dispatch-events-vcenter:solo
+image: dispatchframework/dispatch-events-vcenter:solo-auth
 expose: false
 name: vcenter
 ---
