@@ -3,14 +3,15 @@ name: cloudmaster
 sourcePath: 'cloudmaster.py'
 image: python3
 secrets:
-  - cloudmaster
+- cloudmaster
+- slack
 ---
 kind: Function
 name: gcp
 sourcePath: 'gcp.py'
 image: python3-cloud
 secrets:
-  - gcp
+- gcp
 ---
 kind: Function
 name: aws
@@ -38,7 +39,7 @@ name: status
 sourcePath: 'status.py'
 image: python3-cloud
 secrets:
-  - vsphere
+- vsphere
 ---
 kind: Function
 name: echo
@@ -50,5 +51,13 @@ name: harden-vm
 sourcePath: 'hardenvm.ps1'
 image: powershell-powercli
 secrets:
-  - vsphere
+- vsphere
+- slack
+---
+kind: Function
+name: status
+sourcePath: 'status.py'
+image: python3
+secrets:
+- slack
 

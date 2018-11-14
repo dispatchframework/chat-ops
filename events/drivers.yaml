@@ -1,5 +1,5 @@
 kind: DriverType
-image: dispatchframework/dispatch-events-vcenter:solo
+image: dispatchframework/dispatch-events-vcenter:solo-auth
 expose: false
 name: vcenter
 ---
