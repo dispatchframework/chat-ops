@@ -2,12 +2,11 @@ import { Injectable } from '@angular/core';
 import { Http, Response, RequestOptions, Headers }  from '@angular/http';
 import { Observable }                               from 'rxjs/Observable';
 import { environment }                              from '../../environments/environment';
-import { interval } from 'rxjs';
+import { interval, throwError } from 'rxjs';
 
 import 'rxjs/add/operator/map';
 import 'rxjs/add/operator/catch';
 import 'rxjs/add/operator/switchMap';
-import 'rxjs/add/observable/throw';
 
 import { VM } from '../vm/vm';
 
@@ -50,14 +49,14 @@ export abstract class VMService {
       .catch(this.handleError);
   }
 
-  private extractVMs(cloud: string, res: Response) {
+  extractVMs(cloud: string, res: Response) {
     let data = res.json();
     if (data) {
       data.forEach(element => {
         element.cloud = cloud
         element.name = element.name
         element.id = element.id
-        element.state = element.state
+        element.state = element.status
       });
       console.log(data);
       return data;
@@ -76,6 +75,6 @@ export abstract class VMService {
       errMsg = error.message ? error.message : error.toString();
     }
     console.error(errMsg);
-    return Observable.throw(errMsg);
+    return throwError(errMsg);
   }
 }
