@@ -37,6 +37,8 @@ Now, let's go ahead and store the secret in Dispatch:
 dispatch create secret slack slack.json
 ```
 
+> Note: Templates for all of the secrets used can be found in the `secrets` directory.
+
 ## Create Slack Slash Command
 
 Next we use a slack slash comand to issue "cloudmaster" commands.  Setup again should be pretty straightforward.
@@ -62,7 +64,7 @@ Also for method, choose `POST`.  The rest of the configuration is mostly informa
 
 The cloudmaster function that we create later will need the a URL to connect back to the Dispatch API server.  Because
 the function is running in a docker container simply using `http://localhost:8080` does not work.  Instead use the
-internal IP address used by the host.  For Linux/OVA deployments:
+internal IP address used by the host and store this as `cloudmaster.json`.  For Linux/OVA deployments:
 
 ```json
 {
@@ -76,6 +78,12 @@ If running natively on mac:
 {
   "url": "http://host.docker.internal:8080"
 }
+```
+
+Now, let's go ahead and store the secret in Dispatch:
+
+```
+dispatch create secret cloudmaster cloudmaster.json
 ```
 
 ## Creating Cloud Secrets
@@ -116,12 +124,20 @@ dispatch create secret azure azure.json
 ```
 
 #### GCP
-Create a JSON file `gcp.json` with following contents:
+Create a [GCP service account key](https://cloud.google.com/iam/docs/creating-managing-service-account-keys) and save it as `gcp.json`. It should have similar contents:
 ```json
+{
   "type": "service_account",
-  "project_id": "<project_id>",
-  ... Other service account credentials, as included in the JSON file downloaded from GCP IAM.
-  "zone": "us-west1-c"
+  "project_id": "<project id>",
+  "private_key_id": "...",
+  "private_key": "...",
+  "client_email": "...",
+  "client_id": "...",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/..."
+}
 ```
 adjust the values to your environment. Then run:
 ```bash
@@ -146,8 +162,9 @@ dispatch create secret vsphere vsphere.json
 ```
 
 ## Creating Seed Images
-Dispatch comes with few images that are pre-configured for most common use cases. Base Images bring support for different
-programming languages, where as Images build upon them, adding system and runtime dependencies. Run
+Dispatch comes with few images that are pre-configured for most common use cases. Base Images bring support for
+different programming languages, where as Images build upon them, adding system and runtime dependencies. If the base
+images have not been created yet, run:
 ```bash
 dispatch create seed-images
 ```
